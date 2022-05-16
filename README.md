@@ -10,3 +10,6 @@ cd threejs-template
 npm install
 npx parcel index.html
 ```
+
+## TODO
+- [ ] Reactify
