@@ -1,6 +1,5 @@
 import * as THREE from "three";
-import oc from 'three-orbit-controls'
-const OrbitControls = oc(THREE)
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 import fragment from "./shaders/fragment.glsl";
 import vertex from "./shaders/vertex.glsl";
@@ -68,17 +67,14 @@ export default class Sketch {
       uniforms: {
         time: { type: "f", value: 0 },
         resolution: { type: "v4", value: new THREE.Vector4() },
-        uvRate1: {
-          value: new THREE.Vector2(1, 1)
-        }
       },
       vertexShader: vertex,
       fragmentShader: fragment
     });
 
-    this.geometry = new THREE.PlaneGeometry(1, 1, 1, 1);
+    const boxGeo = new THREE.BoxGeometry(1, 1, 1)
 
-    this.plane = new THREE.Mesh(this.geometry, this.material);
+    this.plane = new THREE.Mesh(boxGeo, this.material);
     this.scene.add(this.plane);
   }
 
