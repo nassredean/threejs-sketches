@@ -73,9 +73,12 @@ export default class Sketch {
     });
 
     const boxGeo = new THREE.BoxGeometry(1, 1, 1)
+    const sphereGeo = new THREE.SphereGeometry( 15, 32, 16 );
 
-    this.plane = new THREE.Mesh(boxGeo, this.material);
-    this.scene.add(this.plane);
+    // this.box = new THREE.Mesh(boxGeo, this.material);
+    // this.scene.add(this.box);
+    this.sphere = new THREE.Mesh(sphereGeo, this.material)
+    this.scene.add(this.sphere)
   }
 
   stop() {
