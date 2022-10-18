@@ -16,7 +16,7 @@ export default class Sketch {
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(this.width, this.height);
-    this.renderer.setClearColor(0xeeeeee, 1);
+    this.renderer.setClearColor(0x40E0D0, 1);
     this.renderer.outputEncoding = THREE.sRGBEncoding;
 
     this.container.appendChild(this.renderer.domElement);
@@ -73,12 +73,9 @@ export default class Sketch {
     });
 
     const boxGeo = new THREE.BoxGeometry(1, 1, 1)
-    const sphereGeo = new THREE.SphereGeometry( 15, 32, 16 );
 
-    // this.box = new THREE.Mesh(boxGeo, this.material);
-    // this.scene.add(this.box);
-    this.sphere = new THREE.Mesh(sphereGeo, this.material)
-    this.scene.add(this.sphere)
+    this.box = new THREE.Mesh(boxGeo, this.material);
+    this.scene.add(this.box);
   }
 
   stop() {
