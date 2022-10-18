@@ -1,9 +1,11 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import Model from "./models/VoronoiBall.fbx";
 
 import fragment from "./shaders/fragment.glsl";
 import vertex from "./shaders/vertex.glsl";
-
 
 export default class Sketch {
   constructor(options) {
@@ -28,7 +30,7 @@ export default class Sketch {
       1000
     );
 
-    this.camera.position.set(0, 0, 2);
+    this.camera.position.set(0, 0, 200);
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.time = 0;
 
@@ -69,16 +71,36 @@ export default class Sketch {
         resolution: { type: "v4", value: new THREE.Vector4() },
       },
       vertexShader: vertex,
-      fragmentShader: fragment
+      fragmentShader: fragment,
     });
 
-    const boxGeo = new THREE.BoxGeometry(1, 1, 1)
-    const sphereGeo = new THREE.SphereGeometry( 15, 32, 16 );
+    // const boxGeo = new THREE.BoxGeometry(1, 1, 1)
+    // const sphereGeo = new THREE.SphereGeometry(15, 32, 16);
 
     // this.box = new THREE.Mesh(boxGeo, this.material);
     // this.scene.add(this.box);
-    this.sphere = new THREE.Mesh(sphereGeo, this.material)
-    this.scene.add(this.sphere)
+    // this.sphere = new THREE.Mesh(sphereGeo, this.material);
+    // this.scene.add(this.sphere);
+
+    const fbxLoader = new FBXLoader();
+    fbxLoader.load(Model, (object) => {
+      object.traverse(function (child) {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+
+      this.scene.add( object );
+    });
+
+    // const path = require("./models/VoronoiBall.gltf");
+    // const loader = new GLTFLoader();
+    // loader.load("./models/VoronoiBall.gltf", function (gltf) {
+    //   scene.add(gltf.scene);
+
+    //   render();
+    // });
   }
 
   stop() {
@@ -87,7 +109,7 @@ export default class Sketch {
 
   play() {
     if (!this.isPlaying) {
-      this.render()
+      this.render();
       this.isPlaying = true;
     }
   }
@@ -102,5 +124,5 @@ export default class Sketch {
 }
 
 new Sketch({
-  dom: document.getElementById("container")
+  dom: document.getElementById("container"),
 });
