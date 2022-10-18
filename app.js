@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import GUI from 'lil-gui';
 
 import fragment from "./shaders/fragment.glsl";
 import vertex from "./shaders/vertex.glsl";
@@ -39,15 +38,6 @@ export default class Sketch {
     this.resize();
     this.render();
     this.setupResize();
-    // this.settings();
-  }
-
-  settings() {
-    this.settings = {
-      progress: 0,
-    };
-    this.gui = new GUI();
-    this.gui.add(this.settings, "progress", 0, 1, 0.01);
   }
 
   setupResize() {
@@ -67,7 +57,6 @@ export default class Sketch {
       side: THREE.DoubleSide,
       uniforms: {
         time: { type: "f", value: 0 },
-        resolution: { type: "v4", value: new THREE.Vector4() },
       },
       vertexShader: vertex,
       fragmentShader: fragment
