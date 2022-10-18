@@ -4,7 +4,6 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import fragment from "./shaders/fragment.glsl";
 import vertex from "./shaders/vertex.glsl";
 
-
 export default class Sketch {
   constructor(options) {
     this.scene = new THREE.Scene();
@@ -59,13 +58,29 @@ export default class Sketch {
         time: { type: "f", value: 0 },
       },
       vertexShader: vertex,
-      fragmentShader: fragment
+      fragmentShader: fragment,
     });
 
-    const boxGeo = new THREE.BoxGeometry(1, 1, 1)
+    const boxGeo = new THREE.BoxGeometry(1, 1, 1);
 
-    this.box = new THREE.Mesh(boxGeo, this.material);
-    this.scene.add(this.box);
+
+    this.boxes = [
+      new THREE.Mesh(boxGeo, this.material),
+      new THREE.Mesh(boxGeo, this.material),
+      new THREE.Mesh(boxGeo, this.material),
+    ];
+
+    this.boxes[0].position.set(0, 7, 0);
+    this.boxes[0].rotation.set(0, 270, 0);
+    this.boxes[1].position.set(0, 7, -7);
+    this.boxes[1].rotation.set(-90, 270, 90);
+    this.boxes[2].position.set(0, 0, 0);
+    this.boxes[2].rotation.set(0, 0, -90);
+
+    for (let i = 0 ; i < this.boxes.length; i++) {
+      let box = this.boxes[i];
+      this.scene.add(box);
+    }
   }
 
   stop() {
@@ -74,7 +89,7 @@ export default class Sketch {
 
   play() {
     if (!this.isPlaying) {
-      this.render()
+      this.render();
       this.isPlaying = true;
     }
   }
@@ -89,5 +104,5 @@ export default class Sketch {
 }
 
 new Sketch({
-  dom: document.getElementById("container")
+  dom: document.getElementById("container"),
 });
