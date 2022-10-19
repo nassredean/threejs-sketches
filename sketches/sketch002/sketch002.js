@@ -28,7 +28,7 @@ class PostEffect {
 
   createObj() {
     return new THREE.Mesh(
-      new THREE.PlaneBufferGeometry(2, 2),
+      new THREE.PlaneGeometry(2, 2),
       new THREE.RawShaderMaterial({
         uniforms: this.uniforms,
         vertexShader: postVertex,
@@ -39,7 +39,6 @@ class PostEffect {
 
   render(time) {
     this.uniforms.time.value = time;
-
   }
 
   resize(width, height) {
@@ -54,15 +53,14 @@ export default class Sketch {
     this.height = this.container.offsetHeight;
 
     this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(this.width, this.height);
     this.renderer.setClearColor(new THREE.Color("white"), 1.0);
+    this.renderer.outputEncoding = THREE.sRGBEncoding;
 
     this.container.appendChild(this.renderer.domElement);
 
-    this.renderTarget = new THREE.WebGLRenderTarget(
-      this.width,
-       this.height 
-    )
+    this.renderTarget = new THREE.WebGLRenderTarget(this.width, this.height);
 
     this.renderTargetScene = new THREE.Scene();
     this.renderTargetCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -77,8 +75,12 @@ export default class Sketch {
 
     this.time = 0;
 
-    this.postEffect = new PostEffect(this.renderTarget.texture, this.width, this.height);
-    this.renderTargetScene.add(this.postEffect.obj)
+    this.postEffect = new PostEffect(
+      this.renderTarget.texture,
+      this.width,
+      this.height
+    );
+    this.renderTargetScene.add(this.postEffect.obj);
 
     this.play();
     this.setupResize();
