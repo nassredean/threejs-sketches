@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import GUI from "lil-gui";
 
-import fragment from "./shaders/fragment.glsl";
-import vertex from "./shaders/vertex.glsl";
-
+import fragment from "../../shaders/edgeDetectionFragment.glsl";
+import vertex from "../../shaders/vertex.glsl";
 
 export default class Sketch {
   constructor(options) {
@@ -16,7 +16,7 @@ export default class Sketch {
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(this.width, this.height);
-    this.renderer.setClearColor(0xeeeeee, 1);
+    this.renderer.setClearColor(0x000000, 1);
     this.renderer.outputEncoding = THREE.sRGBEncoding;
 
     this.container.appendChild(this.renderer.domElement);
@@ -38,15 +38,15 @@ export default class Sketch {
     this.resize();
     this.render();
     this.setupResize();
-    // this.settings();
+    this.settings();
   }
 
   settings() {
     this.settings = {
-      progress: 0,
+      wireThickness: 1,
     };
-    this.gui = new dat.GUI();
-    this.gui.add(this.settings, "progress", 0, 1, 0.01);
+    this.gui = new GUI();
+    this.gui.add(this.settings, "wireThickness", 0, 5, 0.1);
   }
 
   setupResize() {
@@ -66,16 +66,31 @@ export default class Sketch {
       side: THREE.DoubleSide,
       uniforms: {
         time: { type: "f", value: 0 },
-        resolution: { type: "v4", value: new THREE.Vector4() },
+        thickness: { type: "f", value: this.settings.wireThickness },
       },
       vertexShader: vertex,
-      fragmentShader: fragment
+      fragmentShader: fragment,
     });
 
-    const boxGeo = new THREE.BoxGeometry(1, 1, 1)
+    const boxGeo = new THREE.BoxGeometry(1, 1, 1);
 
-    this.plane = new THREE.Mesh(boxGeo, this.material);
-    this.scene.add(this.plane);
+    this.boxes = [
+      new THREE.Mesh(boxGeo, this.material),
+      new THREE.Mesh(boxGeo, this.material),
+      new THREE.Mesh(boxGeo, this.material),
+    ];
+
+    this.boxes[0].position.set(0, 7, 0);
+    this.boxes[0].rotation.set(0, 270, 0);
+    this.boxes[1].position.set(0, 7, -7);
+    this.boxes[1].rotation.set(-90, 270, 90);
+    this.boxes[2].position.set(0, 0, 0);
+    this.boxes[2].rotation.set(0, 0, -90);
+
+    for (let i = 0; i < this.boxes.length; i++) {
+      let box = this.boxes[i];
+      this.scene.add(box);
+    }
   }
 
   stop() {
@@ -84,7 +99,7 @@ export default class Sketch {
 
   play() {
     if (!this.isPlaying) {
-      this.render()
+      this.render();
       this.isPlaying = true;
     }
   }
@@ -93,11 +108,12 @@ export default class Sketch {
     if (!this.isPlaying) return;
     this.time += 0.05;
     this.material.uniforms.time.value = this.time;
+    this.material.uniforms.thickness.value = this.settings.wireThickness;
     requestAnimationFrame(this.render.bind(this));
     this.renderer.render(this.scene, this.camera);
   }
 }
 
 new Sketch({
-  dom: document.getElementById("container")
+  dom: document.getElementById("container"),
 });
