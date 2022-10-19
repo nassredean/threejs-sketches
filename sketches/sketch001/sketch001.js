@@ -3,7 +3,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
 
 import fragment from "../../shaders/edgeDetectionFragment.glsl";
-import vertex from "../../shaders/vertex.glsl";
+import vertex from "../../shaders/vertexProject.glsl";
 
 export default class Sketch {
   constructor(options) {
@@ -107,8 +107,10 @@ export default class Sketch {
   render() {
     if (!this.isPlaying) return;
     this.time += 0.05;
+
     this.material.uniforms.time.value = this.time;
     this.material.uniforms.thickness.value = this.settings.wireThickness;
+
     requestAnimationFrame(this.render.bind(this));
     this.renderer.render(this.scene, this.camera);
   }
