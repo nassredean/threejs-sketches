@@ -32,11 +32,9 @@ export default class Sketch {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.time = 0;
 
-    this.isPlaying = true;
-
     this.addObjects();
-    this.resize();
-    this.render();
+
+    this.play();
     this.setupResize();
     this.settings();
   }
@@ -99,8 +97,8 @@ export default class Sketch {
 
   play() {
     if (!this.isPlaying) {
-      this.render();
       this.isPlaying = true;
+      this.render();
     }
   }
 
