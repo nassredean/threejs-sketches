@@ -3,6 +3,9 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import RoseModel from "../../models/rose.glb";
 
+import fragment from "../../shaders/edgeDetectionFragment.glsl";
+import vertex from "../../shaders/vertexProject.glsl";
+
 export default class Sketch {
   constructor(options) {
     this.scene = new THREE.Scene();
@@ -49,9 +52,13 @@ export default class Sketch {
   }
 
   addObjects() {
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(1, 1, 1).normalize();
+    this.scene.add(light);
     const loader = new GLTFLoader();
     loader.load(RoseModel, (gltf) => {
-      this.scene.add(gltf.scene);
+      let rose = gltf.scene.children[0];
+      this.scene.add(rose);
     });
   }
 
