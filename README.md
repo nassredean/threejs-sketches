@@ -1,6 +1,4 @@
-# Three.js template
-
-A lightweight template using parcel to build/serve a static three.js site.
+# Three.js sketches
 
 ##  Installation and startup
 
@@ -8,8 +6,5 @@ A lightweight template using parcel to build/serve a static three.js site.
 git clone https://github.com/nassredean/threejs-template.git
 cd threejs-template
 npm install
-npx parcel index.html
+npm start
 ```
-
-## TODO
-- [ ] Reactify

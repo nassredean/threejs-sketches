@@ -1,8 +1,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import GUI from "lil-gui";
 
-import fragment from "./shaders/fragment.glsl";
-import vertex from "./shaders/vertex.glsl";
+import fragment from "../../shaders/edgeDetectionFragment.glsl";
+import vertex from "../../shaders/vertex.glsl";
 
 export default class Sketch {
   constructor(options) {
@@ -37,6 +38,15 @@ export default class Sketch {
     this.resize();
     this.render();
     this.setupResize();
+    this.settings();
+  }
+
+  settings() {
+    this.settings = {
+      wireThickness: 1,
+    };
+    this.gui = new GUI();
+    this.gui.add(this.settings, "wireThickness", 0, 5, 0.1);
   }
 
   setupResize() {
@@ -56,13 +66,13 @@ export default class Sketch {
       side: THREE.DoubleSide,
       uniforms: {
         time: { type: "f", value: 0 },
+        thickness: { type: "f", value: this.settings.wireThickness },
       },
       vertexShader: vertex,
       fragmentShader: fragment,
     });
 
     const boxGeo = new THREE.BoxGeometry(1, 1, 1);
-
 
     this.boxes = [
       new THREE.Mesh(boxGeo, this.material),
@@ -77,7 +87,7 @@ export default class Sketch {
     this.boxes[2].position.set(0, 0, 0);
     this.boxes[2].rotation.set(0, 0, -90);
 
-    for (let i = 0 ; i < this.boxes.length; i++) {
+    for (let i = 0; i < this.boxes.length; i++) {
       let box = this.boxes[i];
       this.scene.add(box);
     }
@@ -98,6 +108,7 @@ export default class Sketch {
     if (!this.isPlaying) return;
     this.time += 0.05;
     this.material.uniforms.time.value = this.time;
+    this.material.uniforms.thickness.value = this.settings.wireThickness;
     requestAnimationFrame(this.render.bind(this));
     this.renderer.render(this.scene, this.camera);
   }

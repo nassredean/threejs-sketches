@@ -1,5 +1,4 @@
 uniform float time;
-uniform vec2 pixels;
 
 varying vec2 vUv;
 varying vec3 vPosition;
