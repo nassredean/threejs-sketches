@@ -3,9 +3,6 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import RoseModel from "../../models/rose.glb";
 
-import fragment from "../../shaders/edgeDetectionFragment.glsl";
-import vertex from "../../shaders/vertexProject.glsl";
-
 export default class Sketch {
   constructor(options) {
     this.scene = new THREE.Scene();
