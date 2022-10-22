@@ -5,14 +5,14 @@ import Stats from "three/examples/jsm/libs/stats.module.js";
 import GUI from "lil-gui";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import RoseModel from "../../models/rose.glb";
+import SceneGLB from "../../models/scene.glb";
 
 import {
-  BackSide,
   BoxGeometry,
   Mesh,
   MeshLambertMaterial,
   MeshStandardMaterial,
+  BackSide,
   PointLight,
   Scene,
 } from "three";
@@ -23,6 +23,13 @@ class EnvironmentScene extends Scene {
 
     const geometry = new BoxGeometry();
     geometry.deleteAttribute("uv");
+    const roomMaterial = new MeshStandardMaterial({
+      metalness: 0,
+      side: BackSide,
+    });
+    const room = new Mesh(geometry, roomMaterial);
+    room.scale.setScalar(10);
+    this.add(room);
 
     const mainLight = new PointLight(0xffffff, 50, 0, 2);
     this.add(mainLight);
@@ -67,8 +74,7 @@ const params = {
 
 let container, stats;
 let camera, scene, renderer, controls;
-// let torusMesh;
-let floorMesh;
+let cubeMeshes = [];
 let generatedCubeRenderTarget;
 
 function init() {
@@ -89,33 +95,25 @@ function init() {
   renderer.physicallyCorrectLights = true;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
-  // let geometry = new THREE.TorusKnotGeometry(18, 8, 150, 20);
-  // let geometry = new THREE.SphereGeometry( 26, 64, 32 );
-  // let material = new THREE.MeshStandardMaterial({
-  //   color: 0xffffff,
-  //   metalness: params.metalness,
-  //   roughness: params.roughness,
-  // });
-
-  // torusMesh = new THREE.Mesh(geometry, material);
-  // scene.add(torusMesh);
-
-  const geoFloor = new THREE.BoxGeometry(200, 0.1, 200);
   const matStdFloor = new THREE.MeshStandardMaterial({
     color: 0x808080,
     roughness: 0.1,
     metalness: 0,
   });
-  floorMesh = new THREE.Mesh(geoFloor, matStdFloor);
-  scene.add(floorMesh);
 
   const loader = new GLTFLoader();
-  loader.load(RoseModel, (gltf) => {
-    let rose = gltf.scene.children[0];
-    rose.material = matStdFloor;
-    rose.position.y += 10;
-    scene.add(rose);
+  loader.load(SceneGLB , (gltf) => {
+    gltf.scene.scale.setScalar(4);
+    
+    cubeMeshes = gltf.scene.getObjectByName('cubes').children;
+    cubeMeshes.forEach((cube) => {
+      cube.material = matStdFloor;
+    });
+
+    scene.add(gltf.scene);
   });
+
+
 
   THREE.DefaultLoadingManager.onLoad = function () {
     pmremGenerator.dispose();
@@ -129,9 +127,9 @@ function init() {
 
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(new THREE.Color("white"), 1.0);
   container.appendChild(renderer.domElement);
 
-  //renderer.toneMapping = ReinhardToneMapping;
   renderer.outputEncoding = THREE.sRGBEncoding;
 
   stats = new Stats();
@@ -145,8 +143,6 @@ function init() {
 
   const gui = new GUI();
 
-  gui.add(params, "roughness", 0, 1, 0.01);
-  gui.add(params, "metalness", 0, 1, 0.01);
   gui.add(params, "exposure", 0, 2, 0.01);
   gui.open();
 }
@@ -175,16 +171,18 @@ function render() {
 
   const newEnvMap = renderTarget ? renderTarget.texture : null;
 
-  if (newEnvMap && newEnvMap !== floorMesh.material.envMap) {
-    floorMesh.material.envMap = newEnvMap;
-    floorMesh.material.needsUpdate = true;
+  if (newEnvMap) {
+    for (let i = 0; i < cubeMeshes.length; i++) {
+      let mesh = cubeMeshes[i];
+      if (newEnvMap !== mesh.material.envMap) {
+        mesh.material.envMap = newEnvMap;
+        mesh.material.needsUpdate = true;
+      }
+    } 
   }
 
   scene.background = cubeMap;
   renderer.toneMappingExposure = params.exposure;
-
-  // console.log(camera.position)
-  // console.log(camera.rotation)
 
   renderer.render(scene, camera);
 }
